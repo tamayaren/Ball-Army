@@ -26,7 +26,7 @@ public class SwordsmanCore : UnitCore
     {
         if (this.target)
         {
-            TryGetComponent(out Humanoid targetHumanoid);
+            this.target.TryGetComponent(out Humanoid targetHumanoid);
             float distance = Vector3.Distance(this.transform.position, this.target.position);
             this.agent.SetDestination(this.target.position);
             
