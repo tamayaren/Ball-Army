@@ -28,7 +28,7 @@ public class SwordsmanCore : UnitCore
         {
             this.target.TryGetComponent(out Humanoid targetHumanoid);
             float distance = Vector3.Distance(this.transform.position, this.target.position);
-            this.agent.SetDestination(this.target.position);
+            if (this.agent.isActiveAndEnabled && this.agent.isOnNavMesh) this.agent.SetDestination(this.target.position);
             
             this.agent.updateRotation = (distance >= this.swordRange);
             this.agent.isStopped = (distance <= this.swordRange);
@@ -52,11 +52,4 @@ public class SwordsmanCore : UnitCore
         Decide();
     }
     
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(this.transform.position, this.unitRange);
-    }
-#endif
 }

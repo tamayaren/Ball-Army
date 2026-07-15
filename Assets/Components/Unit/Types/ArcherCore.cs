@@ -5,11 +5,13 @@ public class ArcherCore : UnitCore
     public override float unitHealth { get; set; } = 125f;
     public override float unitRange { get; set; } = 50f;
     public override float unitSpeed { get; set; } = 8f;
-    public override float actionCooldown { get; set; } = .25f;
-
-    private float damage = 15f;
+    public override float actionCooldown { get; set; } = 2f;
+    
+    private ProjectileSpawner projectileSpawner;
+    private float damage = 75f;
     private float pollingRate = .2f;
     private float pollingTime;
+    
 
     protected float archerRange = 10f;
 
@@ -17,6 +19,7 @@ public class ArcherCore : UnitCore
     {
         TryGetComponent(out this.humanoid);
         TryGetComponent(out this.team);
+        TryGetComponent(out this.projectileSpawner);
     } 
 
     private void Decide()
@@ -25,7 +28,7 @@ public class ArcherCore : UnitCore
         {
             this.target.TryGetComponent(out Humanoid targetHumanoid);
             float distance = Vector3.Distance(this.transform.position, this.target.position);
-            this.agent.SetDestination(this.target.position);
+            if (this.agent.isActiveAndEnabled && this.agent.isOnNavMesh) this.agent.SetDestination(this.target.position);
             
             this.agent.updateRotation = (distance >= this.archerRange);
             this.agent.isStopped = (distance <= this.archerRange);
@@ -37,7 +40,7 @@ public class ArcherCore : UnitCore
                 this.transform.rotation = targetRotation;
                 this.animator.SetTrigger("Attack");
                 
-                targetHumanoid.Damage(Random.Range(this.damage - 5f, this.damage + 5f));
+                this.projectileSpawner.SpawnProjectile(this.transform, this.target.position, 1f, this.damage, this.team.team, .15f);
             }
         }
     }
@@ -48,12 +51,4 @@ public class ArcherCore : UnitCore
         
         Decide();
     }
-    
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(this.transform.position, this.unitRange);
-    }
-#endif
 }
